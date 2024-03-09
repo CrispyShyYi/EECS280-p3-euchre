@@ -35,12 +35,11 @@ public:
         if (playCard[i].is_trump(potenTrump) && playCard[i].is_face_or_ace()){
           trumpFace++;
         }
-      }
+      }      
       if (trumpFace >= 2){
           order_up_suit = potenTrump;
           return true;
         }
-      return false;
     }
     else if (round == 2){
       Suit potenTrump = Suit_next(upcard.get_suit());
@@ -69,8 +68,13 @@ public:
         index = i;
       }
     }
-    playCard[index] = upcard;
+    cout << endl;
+    if (Card_less(playCard[index], upcard, upcard.get_suit())){
+      playCard[index] = upcard;
+      return;
+    }
   }
+
 
   Card lead_card(Suit trump) override{
     assert(playCard.size() >= 1);
@@ -82,14 +86,14 @@ public:
 
     for (int i = 0; i < playCard.size(); i++){
       if (!playCard[i].is_trump(trump)){
-        if (operator<(highestNonTrump, playCard[i])){
+        if (Card_less(highestNonTrump, playCard[i], trump)){
           highestNonTrump = playCard[i];
           indexOfNonTrump = i;
         }
       }
       else if(playCard[i].is_trump(trump)){
         numOfTrump++;
-        if (operator<(highestTrump, playCard[i])){
+        if (Card_less(highestTrump, playCard[i], trump)){
           highestTrump = playCard[i];
           indexOfTrump = i;
         }
@@ -105,11 +109,12 @@ public:
     }
   }
 
+
   Card play_card(const Card &led_card, Suit trump) override{
     assert(playCard.size() >= 1);
     Suit ledSuit = led_card.get_suit(trump);
     int numOfSuit = 0;
-    Card maxCard;
+    Card maxCard = Card(EIGHT, ledSuit);
     Card minCard;
     int index = 0;
 
@@ -119,9 +124,8 @@ public:
       }
     }
     if (numOfSuit > 0){
-      maxCard = Card(EIGHT, led_card.get_suit(trump));
       for (int j = 0; j < playCard.size(); j++){
-        if (Card_less(maxCard, playCard[j], trump) && 
+        if (Card_less(maxCard, playCard[j], led_card, trump) && 
         playCard[j].get_suit(trump) == ledSuit){
           maxCard = playCard[j];
           index = j;
@@ -132,8 +136,8 @@ public:
     }
     else {
       minCard = playCard[0];
-      for (int k = 0; k < playCard.size(); k++){
-        if (Card_less(playCard[k], minCard, trump)){
+      for (int k = 1; k < playCard.size(); k++){
+        if (Card_less(playCard[k], minCard, led_card, trump)){
           minCard = playCard[k];
           index = k;
         }
@@ -183,8 +187,7 @@ class HumanPlayer : public Player{
     cin >> decision;
 
     if (decision != "pass") {
-      Suit ordered_up = string_to_suit(decision);
-      order_up_suit = ordered_up;
+      order_up_suit = string_to_suit(decision);
       return true;
     }
     else {
@@ -196,7 +199,8 @@ class HumanPlayer : public Player{
     assert(hand.size() > 0);
     print_hand();
     cout << "Discard upcard: [-1]\n";
-    cout << "Human player " << name << ", please enter a suit, or \"pass\":\n";
+    cout << "Human player " << name << 
+            ", please select a card to discard:\n\n";
     int index;
     cin >> index;
     if (index == -1) {

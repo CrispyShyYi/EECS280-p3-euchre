@@ -145,11 +145,6 @@ TEST(test_Card_greater_or_equal_operator){
     Card lower_card(KING, SPADES);
     ASSERT_TRUE(!Card_less(higher_card, lower_card, trump) || higher_card == lower_card);
     ASSERT_FALSE(!Card_less(lower_card, higher_card, trump) || lower_card == higher_card);
-
-    Card equal_card1(ACE, HEARTS);
-    Card equal_card2(ACE, SPADES);
-    ASSERT_TRUE(!Card_less(equal_card1, equal_card2, trump) || equal_card1 == equal_card2);
-    ASSERT_TRUE(!Card_less(equal_card2, equal_card1, trump) || equal_card2 == equal_card1);
 }
 
 TEST(test_Card_equal_operator){
@@ -187,7 +182,7 @@ TEST(test_Suit_next){
 TEST(test_Card_less_function){
     Card a(JACK, CLUBS);
     Card b(KING, SPADES);
-    ASSERT_TRUE(Card_less(a, b, SPADES));
+    ASSERT_FALSE(Card_less(a, b, SPADES));
 
     Card c(QUEEN, DIAMONDS);
     Card d(ACE, DIAMONDS);
@@ -204,6 +199,18 @@ TEST(test_Card_less_function){
     Card i(NINE, CLUBS);
     Card j(TEN, CLUBS);
     ASSERT_TRUE(Card_less(i, j, DIAMONDS));
+
+    Card x(KING, CLUBS);
+    Card y(JACK, DIAMONDS);
+    ASSERT_TRUE(Card_less(x, y, DIAMONDS))
+
+    Card x1(KING, CLUBS);
+    Card y1(JACK, HEARTS);
+    ASSERT_TRUE(Card_less(x1, y1, DIAMONDS));
+
+    Card x2(KING, CLUBS);
+    Card y2(NINE, DIAMONDS);
+    ASSERT_TRUE(Card_less(x2, y2, DIAMONDS));
 }
 
 TEST(test_Card_less_with_led){
@@ -230,6 +237,24 @@ TEST(test_Card_less_with_led){
 
     ASSERT_TRUE(Card_less(off_suit_card, led_suit_card, led_card, trump));
     ASSERT_FALSE(Card_less(led_suit_card, off_suit_card, led_card, trump));
+
+
+    Suit Trump = HEARTS;
+    Card card1(JACK, HEARTS);
+    Card card2(TEN, SPADES);
+    Card card3(JACK, DIAMONDS);
+    Card card4(ACE, SPADES);
+    Card card5(ACE, HEARTS);
+    Card card6(ACE, DIAMONDS);
+    Card card7(NINE, HEARTS);
+
+    Card ledcard = card4;
+
+    ASSERT_EQUAL(true, Card_less(card4, card1, ledcard, Trump));
+    ASSERT_EQUAL(true, Card_less(card4, card3, ledcard, Trump));
+    ASSERT_EQUAL(true, Card_less(card4, card7, ledcard, Trump));
+    ASSERT_EQUAL(true, Card_less(card6, card4, ledcard, Trump));
+    ASSERT_EQUAL(true, Card_less(card6, card2, ledcard, Trump));
 }
 
 TEST_MAIN()

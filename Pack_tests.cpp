@@ -18,6 +18,8 @@ TEST(test_shuffle){
     pack.deal_one();
     Card second_card = pack.deal_one();
     ASSERT_EQUAL(second_card, Card(JACK, HEARTS));
+    
+    pack.shuffle();
 }
 
 TEST_MAIN()

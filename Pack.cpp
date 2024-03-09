@@ -5,6 +5,7 @@
 #include <iostream>
 #include <array>
 #include <cassert>
+#include <vector>
 
 using namespace std;
 
@@ -40,16 +41,17 @@ void Pack::reset() {
 }
 
 void Pack::shuffle(){
+  next = 0;
   std::array<Card, PACK_SIZE> temp;
   int num = 0;
   for (size_t i = 0; i < 7; i++){
     num = 0;
-    for (size_t j = 1; j < PACK_SIZE; j += 2){
-      temp[j] = cards[num];
+    for (size_t k = 1; k < PACK_SIZE; k += 2){
+      temp[k] = cards[num];
       num++;
     }
-    for (size_t k = 0; k < PACK_SIZE - 1; k += 2){
-      temp[k] = cards[num];
+    for (size_t j = 0; j < PACK_SIZE - 1; j += 2){
+      temp[j] = cards[num];
       num++;
     }
 

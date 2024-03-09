@@ -61,6 +61,125 @@ TEST(test_player_make_trump) {
 
   ASSERT_FALSE(orderup);
   delete bob;
+
+  Player * alf = Player_factory("Alf", "Simple");
+  Card up_card(ACE, HEARTS);
+  trump = HEARTS;
+  Card c1(JACK, HEARTS);
+  Card c2(JACK, DIAMONDS);
+  Card c3(TEN, SPADES);
+  Card c4(NINE, DIAMONDS);
+  Card c5(JACK, CLUBS);
+
+  alf->add_card(c1);
+  alf->add_card(c2);
+  alf->add_card(c3);
+  alf->add_card(c4);
+  alf->add_card(c5);  
+
+  ASSERT_TRUE(alf->make_trump(up_card, true, 1, trump)); 
+  
+  trump = CLUBS;
+  up_card = Card(NINE, CLUBS);
+  ASSERT_FALSE(alf->make_trump(up_card, true, 1, trump));
+  ASSERT_TRUE(alf->make_trump(up_card, true, 2, trump));
+  
+  delete alf;
+
+  // if the player is the dealer;
+  Player * jason = Player_factory("Jason", "Simple");
+  c1 = Card(TEN, HEARTS);
+  c2 = Card(NINE, DIAMONDS);
+  c3 = Card(TEN, SPADES);
+  c4 = Card(NINE, DIAMONDS);
+  c5 = Card(TEN, CLUBS);
+
+  jason->add_card(c1);
+  jason->add_card(c2);
+  jason->add_card(c3);
+  jason->add_card(c4);
+  jason->add_card(c5);
+
+  up_card = Card(ACE, HEARTS);
+  trump = HEARTS;
+
+  ASSERT_FALSE(jason->make_trump(up_card, true, 1, trump));
+  ASSERT_TRUE(jason->make_trump(up_card, true, 2, trump));
+
+  delete jason;
+
+  // if the player is not the dealer;
+  Player * jack = Player_factory("Jack", "Simple");
+  c1 = Card(TEN, HEARTS);
+  c2 = Card(NINE, DIAMONDS);
+  c3 = Card(TEN, SPADES);
+  c4 = Card(NINE, DIAMONDS);
+  c5 = Card(TEN, CLUBS);
+
+  jack->add_card(c1);
+  jack->add_card(c2);
+  jack->add_card(c3);
+  jack->add_card(c4);
+  jack->add_card(c5);
+
+  up_card = Card(ACE, HEARTS);
+  trump = HEARTS;
+
+  ASSERT_FALSE(jack->make_trump(up_card, false, 1, trump));
+  ASSERT_FALSE(jack->make_trump(up_card, false, 2, trump));
+  ASSERT_TRUE(jack->make_trump(up_card, true, 2, trump));
+
+  delete jack;
+
+  Player * ann = Player_factory("Ann", "Simple");
+  c1 = Card(JACK, DIAMONDS);
+  c2 = Card(NINE, DIAMONDS);
+  c3 = Card(TEN, SPADES);
+  c4 = Card(NINE, DIAMONDS);
+  c5 = Card(TEN, CLUBS);
+
+  ann->add_card(c1);
+  ann->add_card(c2);
+  ann->add_card(c3);
+  ann->add_card(c4);
+  ann->add_card(c5);
+
+  up_card = Card(JACK, HEARTS);
+  ASSERT_FALSE(ann->make_trump(up_card, true, 1, trump));
+  ASSERT_TRUE(ann->make_trump(up_card, true, 2, trump));
+  ASSERT_TRUE(ann->make_trump(up_card, false, 2, trump));
+
+  delete ann;
+
+  Player * fiona = Player_factory("Bow", "Simple");
+  fiona->add_card(Card(NINE, SPADES));
+  fiona->add_card(Card(TEN, SPADES));
+  fiona->add_card(Card(QUEEN, SPADES));
+  fiona->add_card(Card(JACK, DIAMONDS));
+  fiona->add_card(Card(JACK, HEARTS));
+
+Player * sam = Player_factory("Bow2", "Simple");
+  sam->add_card(Card(NINE, SPADES));
+  sam->add_card(Card(TEN, SPADES));
+  sam->add_card(Card(QUEEN, SPADES));
+  sam->add_card(Card(ACE, CLUBS));
+  sam->add_card(Card(JACK, DIAMONDS));
+
+Card upcard(ACE, HEARTS);
+Suit trump1;
+
+ASSERT_TRUE(fiona->make_trump(upcard, true, 1, trump1));
+ASSERT_EQUAL(trump1, HEARTS);
+
+Suit trump2;
+
+ASSERT_FALSE(sam->make_trump(upcard, false, 1, trump2));
+
+ASSERT_TRUE(sam->make_trump(upcard, false, 2, trump2));
+ASSERT_EQUAL(trump2, DIAMONDS);
+
+delete fiona;
+delete sam;
 }
 
 TEST(test_player_add_and_discard){
@@ -82,6 +201,28 @@ TEST(test_player_add_and_discard){
   ASSERT_EQUAL(card_led, ace_spades); 
 
   delete bob;
+  
+  // the upcard is less than all 5 cards on hand;
+  Player * alf = Player_factory("Alf", "Simple");
+
+  Card c1(JACK, HEARTS);
+  Card c2(JACK, DIAMONDS);
+  Card c3(QUEEN, HEARTS);
+  Card c4(KING, HEARTS);
+  Card c5(ACE, HEARTS);
+
+  Card up_card (NINE, HEARTS);
+
+  alf->add_card(c1);
+  alf->add_card(c2);
+  alf->add_card(c3);
+  alf->add_card(c4);
+  alf->add_card(c5);  
+  alf->add_and_discard(up_card);
+  for(int i = 0; i < 5; i++){
+    ASSERT_FALSE(alf->lead_card(HEARTS) == up_card);
+  }
+  delete alf;
 } 
 
 TEST(test_lead_card) {
@@ -101,6 +242,17 @@ TEST(test_lead_card) {
   ASSERT_EQUAL(card_played, Card(KING, SPADES));
 
   delete bob;
+
+  // have the left bower;
+  Player * alf = Player_factory("Alf", "Simple");
+  alf->add_card(Card(JACK, CLUBS));
+  alf->add_card(Card(TEN, DIAMONDS));
+  ASSERT_TRUE(alf->lead_card(SPADES) == Card(TEN, DIAMONDS));
+  // all trumps;
+  alf->add_card(Card(JACK, SPADES));
+  ASSERT_TRUE(alf->lead_card(SPADES) == Card(JACK, SPADES));
+  
+  delete alf;
 }
 
 TEST(test_player_play_card){
